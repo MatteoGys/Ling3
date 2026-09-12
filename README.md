@@ -1,4 +1,6 @@
-# Ling3
+
+
+# <img width="32" height="32" alt="icons" src="https://github.com/MatteoGys/Ling3/v2/src-tauri/icons/icon.png" /> Ling3 
 Application développée pour la recherche linguistique
 
 <p align="center">

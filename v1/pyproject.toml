@@ -1,0 +1,12 @@
+[project]
+name = "ling3"
+version = "1.2.1"
+description = "Application d'analyse linguistique"
+
+[tool.flet]
+product = "Ling3"      # Nom affiché : titre de fenêtre, Dock, menu About
+org = "com.ling3"      # À adapter si tu veux (juste un identifiant, ex: com.tonnom)
+company = "Matteo Company"      # Affiché dans les métadonnées/à propos
+
+[tool.flet.macos]
+artifact = "Ling3"      # Nom exact du .app généré sur le disque : Ling3.app

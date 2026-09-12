@@ -1,0 +1,40 @@
+# ────────────────────────────────────────────────────────────────────────
+# GUIDE DE FUSION — ne remplacez pas votre fichier existant tel quel.
+#
+# Gardez EXACTEMENT tels que générés par votre scaffold :
+#   - [package]           (name, version, identifiant... gardez les vôtres)
+#   - [lib]                (le nom généré, ex. "ling3_lib" — copiez-le tel quel)
+#   - [build-dependencies] (tauri-build, déjà configuré chez vous)
+#   - la ligne `tauri = { version = "2", ... }` si elle a déjà des features
+#     précises chez vous (ex. ["macos-private-api"]) — gardez ces features,
+#     ajoutez juste les dépendances ci-dessous À CÔTÉ.
+#
+# Ajoutez seulement les lignes marquées "# ⬅ AJOUT" dans votre [dependencies]
+# existant.
+# ────────────────────────────────────────────────────────────────────────
+
+[package]
+name = "ling3"
+version = "1.2.1"
+description = "Ling3 — outils d'analyse de fichiers TextGrid"
+edition = "2021"
+
+[lib]
+# Doit correspondre exactement à ce que main.rs appelle (`ling3_rust_lib::run()`),
+# généré par le scaffold à partir du nom de dossier "ling3_rust".
+name = "ling3_rust_lib"
+crate-type = ["staticlib", "cdylib", "rlib"]
+
+[build-dependencies]
+tauri-build = { version = "2", features = [] }
+
+[dependencies]
+tauri = { version = "2", features = [] }
+tauri-plugin-opener = "2"          # ⬅ déjà présent dans votre scaffold, remis ici pour mémoire
+tauri-plugin-dialog = "2"          # ⬅ AJOUT (sélecteurs de fichiers/dossiers)
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+dirs = "5"                          # ⬅ AJOUT
+regex = "1"                         # ⬅ AJOUT
+encoding_rs = "0.8"                 # ⬅ AJOUT
+umya-spreadsheet = "1"              # ⬅ AJOUT

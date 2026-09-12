@@ -1,0 +1,12 @@
+Todo :
+
+Supprimer tous les éléments qu'on n'utilise pas ?
+
+Easy : Ajouter _ dans concordancier et Cooccurrences dans contexte gauche et droit pour un intervalle vide. 
+
+Hard : Modifications Trs -> TextGrid : Assia : time de Sync invalide : 918.997
+
+
+--> Icon de lancement ok, mais pas squircle 
+--> Renommer l'application correctement (BODP3)
+--> Exporter en application

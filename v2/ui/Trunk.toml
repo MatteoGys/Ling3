@@ -1,0 +1,11 @@
+[build]
+target = "index.html"
+dist = "dist"
+
+[watch]
+watch = ["src", "styles", "index.html"]
+ignore = ["dist"]
+
+[serve]
+port = 1420
+open = false

@@ -1,0 +1,321 @@
+/* theme.css — Remplace ui/theme.py.
+   Les valeurs hexadécimales sont copiées telles quelles depuis
+   LIGHT_THEME / DARK_THEME pour garder une identité visuelle identique. */
+
+#app-root[data-theme="light"] {
+  --color-red: #d32f2f;
+  --color-white: #FFFFFF;
+  --color-export-default: #388e3c;
+  --color-export-hovered: #006400;
+  --color-validation-default: #00A2ED;
+  --color-validation-hovered: #1985C1;
+  --color-main-text: #1A1A1A;
+  --color-secondary-text: #888888;
+  --color-bg-onglet: #F5F5F5;
+  --color-bg-container: #E9E9E9;
+  --color-bg-container-border: #C4C4C4;
+  --color-sidebar: #F0F0F0;
+  --color-divider: #C4C4C4;
+}
+
+#app-root[data-theme="dark"] {
+  --color-red: #d32f2f;
+  --color-white: #2b2d30;
+  --color-export-default: #388e3c;
+  --color-export-hovered: #006400;
+  --color-validation-default: #00A2ED;
+  --color-validation-hovered: #1985C1;
+  --color-main-text: #dfdfdf;
+  --color-secondary-text: #a4a4a4;
+  --color-bg-onglet: #222222;
+  --color-bg-container: #282828;
+  --color-bg-container-border: #383838;
+  --color-sidebar: #2b2d30;
+  --color-divider: #dfdfdf;
+}
+
+* { box-sizing: border-box; }
+
+html, body {
+  margin: 0;
+  height: 100%;
+  font-family: -apple-system, "Segoe UI", Roboto, sans-serif;
+}
+
+#app-root {
+  display: flex;
+  height: 100vh;
+  background: var(--color-bg-onglet);
+  color: var(--color-main-text);
+}
+
+/* ── Sidebar ─────────────────────────────────────────────────────────── */
+
+.sidebar {
+  width: 230px;
+  background: var(--color-sidebar);
+  border-right: 1px solid var(--color-bg-container-border);
+  padding: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  flex-shrink: 0;
+  transition: width 0.15s ease;
+}
+.sidebar.collapsed { width: 65px; }
+
+.sidebar-header { display: flex; align-items: center; justify-content: space-between; }
+.sidebar-header .app-title { font-weight: bold; font-size: 16px; }
+
+.icon-btn {
+  cursor: pointer; padding: 5px; background: transparent; border: none;
+  color: var(--color-main-text); display: flex; align-items: center; justify-content: center;
+  font-size: 16px;
+}
+
+.divider { height: 1px; background: var(--color-divider); border: none; margin: 4px 0; }
+
+.nav-col { display: flex; flex-direction: column; gap: 2px; flex: 1; }
+.nav-btn {
+  display: flex; align-items: center; gap: 10px;
+  padding: 12px 14px; border-radius: 10px; cursor: pointer;
+  color: var(--color-secondary-text); background: transparent; border: none;
+  font-size: 14px; text-align: left; width: 100%;
+}
+.nav-btn:hover { background: var(--color-white); }
+.nav-btn.active { background: var(--color-bg-container); color: var(--color-validation-default); font-weight: bold; }
+.sidebar.collapsed .nav-btn { justify-content: center; padding: 12px 0; }
+.sidebar.collapsed .nav-label { display: none; }
+
+.sidebar-footer {
+  display: flex; align-items: center; justify-content: space-between;
+  font-size: 11px; color: var(--color-secondary-text);
+}
+.sidebar-footer .actions { display: flex; gap: 6px; }
+.sidebar.collapsed .sidebar-footer { flex-direction: column; gap: 4px; }
+.sidebar.collapsed .version-label { display: none; }
+
+.round-btn {
+  width: 30px; height: 30px; border-radius: 15px;
+  background: var(--color-bg-container); border: none; cursor: pointer;
+  display: flex; align-items: center; justify-content: center; color: var(--color-main-text);
+}
+.round-btn:hover { opacity: 0.8; }
+
+/* ── Zone de contenu / vues ──────────────────────────────────────────── */
+
+.content-area { flex: 1; overflow-y: auto; background: var(--color-bg-onglet); }
+.view-container { padding: 24px; max-width: 1100px; }
+
+/* Layout "zone défilante + barre fixe" pour les vues à liste potentiellement
+   longue (Tokenisation, Concordancier). Contrairement à `position: sticky`
+   (qui ne s'accroche qu'en toute fin de défilement), ceci sépare vraiment le
+   bouton du contenu qui défile : il ne fait jamais partie du calcul de
+   hauteur défilante, donc toujours visible, quelle que soit la longueur du
+   tableau/de la liste. */
+.view-scroll-container {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+.view-scroll-area {
+  flex: 1;
+  min-height: 0; /* nécessaire pour qu'un enfant flex puisse défiler */
+  overflow-y: auto;
+  padding: 24px;
+  max-width: 1100px;
+}
+.view-title { font-size: 26px; font-weight: bold; margin: 0 0 8px 0; }
+
+.btn {
+  height: 45px; padding: 0 18px; border-radius: 8px; border: none;
+  color: var(--color-white); cursor: pointer; font-size: 14px;
+}
+.btn:disabled { opacity: 0.6; cursor: default; }
+.btn-primary { background: var(--color-validation-default); }
+.btn-primary:hover { background: var(--color-validation-hovered); }
+.btn-success { background: var(--color-export-default); }
+.btn-success:hover { background: var(--color-export-hovered); }
+
+.field {
+  background: var(--color-white); border: 1px solid var(--color-bg-container-border);
+  border-radius: 6px; padding: 10px 12px; color: var(--color-main-text);
+  font-size: 14px; width: 100%;
+}
+.field:focus { outline: none; border-color: var(--color-validation-default); }
+
+.card {
+  background: var(--color-bg-container); border: 1px solid var(--color-bg-container-border);
+  border-radius: 10px; padding: 16px; margin-bottom: 20px;
+}
+
+.status-text { font-size: 13px; margin-top: 10px; color: var(--color-secondary-text); }
+.status-error { color: var(--color-red); }
+.status-success { color: var(--color-export-default); }
+
+table.results { width: 100%; border-collapse: collapse; margin-top: 10px; }
+table.results th { text-align: left; padding: 10px; border-bottom: 2px solid var(--color-main-text); }
+table.results td { padding: 8px 10px; border-bottom: 1px solid var(--color-bg-container-border); color: var(--color-main-text); }
+
+/* ── Icônes SVG (remplace les emojis) ───────────────────────────────── */
+/* Taille par défaut pour toute icône utilisée hors des contextes ci-dessous
+   (ex: dans status-text). Placée AVANT les règles plus spécifiques :
+   même spécificité (.svg-icon svg == .nav-icon svg), donc l'ordre décide —
+   les règles suivantes gagnent pour leurs contextes précis. */
+.svg-icon svg { width: 16px; height: 16px; display: block; }
+/* Filet de sécurité pour d'éventuelles icônes futures sans fill="currentColor"
+   propre : ne cible QUE la racine <svg>, jamais ses descendants — sinon un
+   fill="none" intentionnel (ex: cadre transparent des exports Material
+   Icons) serait écrasé et aplatirait l'icône en un bloc plein. Le fill hérite
+   naturellement aux <path> qui n'en définissent pas eux-mêmes. */
+.svg-icon svg { fill: currentColor; }
+
+.nav-icon svg { width: 18px; height: 18px; display: block; flex-shrink: 0; }
+.icon-btn svg { width: 18px; height: 18px; }
+.round-btn svg { width: 15px; height: 15px; }
+
+/* ── Ajouts Tokenisation / Statistiques / Concordancier ─────────────── */
+.btn-outline {
+  background: var(--color-white);
+  color: var(--color-main-text);
+  border: 1px solid var(--color-bg-container-border);
+}
+.btn-outline:hover { background: var(--color-bg-container); }
+
+.dropdown-menu {
+  position: absolute;
+  top: calc(100% + 4px);
+  left: 0;
+  z-index: 20;
+  background: var(--color-white);
+  border: 1px solid var(--color-bg-container-border);
+  border-radius: 8px;
+  padding: 8px;
+  min-width: 180px;
+  max-height: 260px;
+  overflow-y: auto;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+.dropdown-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 8px;
+  border-radius: 6px;
+  color: var(--color-main-text);
+  cursor: pointer;
+  white-space: nowrap;
+}
+.dropdown-item:hover { background: var(--color-bg-container); }
+
+.column-tile {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--color-bg-onglet);
+  border: 1px solid var(--color-bg-container-border);
+  border-radius: 8px;
+  padding: 8px 12px;
+  color: var(--color-main-text);
+}
+.column-tile .icon-btn:disabled { opacity: 0.3; cursor: default; }
+
+/* ── Documentation (info.rs) ─────────────────────────────────────────── */
+.content-area { scroll-behavior: smooth; }
+
+.info-page { padding: 24px; max-width: 1300px; }
+
+.info-hero {
+  background: linear-gradient(135deg, var(--color-validation-default), var(--color-validation-hovered));
+  color: #fff;
+  padding: 32px;
+  border-radius: 14px;
+  margin-bottom: 24px;
+}
+.info-hero h1 { margin: 0 0 8px 0; font-size: 28px; }
+.info-hero p { margin: 0; opacity: 0.92; font-size: 15px; max-width: 640px; line-height: 1.5; }
+
+.info-layout { display: flex; gap: 32px; align-items: flex-start; }
+
+.info-toc {
+  position: sticky;
+  top: 20px;
+  width: 210px;
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  background: var(--color-bg-container);
+  border: 1px solid var(--color-bg-container-border);
+  border-radius: 10px;
+  padding: 10px;
+}
+.info-toc a {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 9px 10px;
+  border-radius: 8px;
+  color: var(--color-main-text);
+  text-decoration: none;
+  font-size: 14px;
+}
+.info-toc a:hover { background: var(--color-white); }
+.info-toc a svg { width: 16px; height: 16px; flex-shrink: 0; }
+
+.info-content { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 20px; }
+
+.info-section {
+  background: var(--color-bg-container);
+  border: 1px solid var(--color-bg-container-border);
+  border-radius: 12px;
+  padding: 24px;
+  scroll-margin-top: 20px;
+}
+.info-section h2 {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 0 0 14px 0;
+  font-size: 20px;
+  color: var(--color-main-text);
+}
+.info-section h2 svg { width: 20px; height: 20px; color: var(--color-validation-default); }
+.info-section p { color: var(--color-main-text); line-height: 1.65; margin: 0 0 12px 0; }
+.info-section p:last-child { margin-bottom: 0; }
+.info-section ul { margin: 8px 0 0 0; padding-left: 20px; color: var(--color-main-text); line-height: 1.6; }
+.info-section li { margin-bottom: 6px; }
+.info-section code {
+  background: var(--color-white);
+  border: 1px solid var(--color-bg-container-border);
+  border-radius: 4px;
+  padding: 1px 6px;
+  font-size: 0.92em;
+}
+
+.info-footer {
+  color: var(--color-secondary-text);
+  font-size: 12px;
+  text-align: center;
+  padding: 12px 0 4px 0;
+}
+
+@media (max-width: 780px) {
+  .info-layout { flex-direction: column; }
+  .info-toc { position: static; width: 100%; flex-direction: row; flex-wrap: wrap; }
+}
+
+/* ── Barre d'action fixe (Export Excel / Générer) ──────────────────────── */
+/* Vraie zone séparée, hors du flux qui défile (voir .view-scroll-container /
+   .view-scroll-area ci-dessus) : toujours visible, quelle que soit la
+   longueur du contenu au-dessus. */
+.view-action-bar-fixed {
+  flex-shrink: 0;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 14px 24px;
+  max-width: 1100px;
+  background: var(--color-bg-onglet);
+  border-top: 1px solid var(--color-bg-container-border);
+}

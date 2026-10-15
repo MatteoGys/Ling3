@@ -13,6 +13,7 @@
 </div>
 
 ---
+[English below]
 
 ## A propos
 <p align="justify">
@@ -59,11 +60,139 @@ Génère un concordancier sur mesure dans un fichier Excel en extrayant chaque o
 Etudie l'environnement immédiat d'un pivot en dénombrant les mots présents à une distance définie. Le résultat présente le type de contexte associe et le nombre d'occurrences globales ou par tier, exportable sous format Excel.
 </p>
 
-### Architecture du projet
-![Architecture de Ling3](assets/diagram.png)
-
 ### Licence
 <p align="justify">
 Ce projet est distribue sous les termes de la licence mentionnée dans le fichier LICENSE.
 </p>
 
+_L'architecture de l'application se trouve en dessous._
+
+---
+
+
+
+## About
+<p align="justify">
+  <i>Ling3</i> is a TextGrid (Praat) file analysis tool designed for linguistic research. The application enables overlap detection, file preparation and conversion, token counting, custom concordance generation, as well as the study of a pivot word's statistical context.
+</p>
+
+---
+
+## Module Features
+
+### 1. Settings
+<p align="justify">
+Before using the analysis tools, the <i>Settings</i> tab allows you to configure:
+- **TextGrid Files**: The file(s) to process (.TextGrid or .txt), required for all analysis tabs.
+- **Excel File**: The workbook (.xlsx) designed to receive exported tables (Tokenization, Concordancer, Co-occurrences).
+- **Separator**: Character used to distinguish multiple pivots entered in the same field (default is a backslash <code>\</code>).
+</p>
+
+### 2. Overlaps
+<p align="justify">
+Verifies that no annotated interval overlaps with an interval from another tier within the same TextGrid file. In case of conflict, the application lists the source tier, interval number, end timecode, text, and conflicting tiers to facilitate localization.
+</p>
+
+### 3. Modifications
+<p align="justify">
+Groups file preparation operations together:
+- **TRS to TextGrid Conversion**: Converts Transcriber files (.trs, CFPP format) into TextGrid files saved to the Desktop (based on the <i>LingTools</i> algorithm from the University of Oregon, enhanced with an error corrector).
+- **Text Replacement and Silence Merging**: Allows replacing a character string across an entire file and merging consecutive silence intervals.
+- **Extraction by Pivot Words**: Isolates intervals containing a specific pivot into a new file, while merging adjacent intervals into silence.
+</p>
+
+### 4. Tokenization
+<p align="justify">
+Counts each token (word) present in the TextGrid files and presents occurrences in table format. Offers search features, column sorting, and direct export to Excel.
+</p>
+
+### 5. Concordancer
+<p align="justify">
+Generates a custom concordancer in an Excel file by extracting each occurrence of a pivot word surrounded by its left and right context. You can configure column order, context word count, and add advanced metadata (timecodes, duration, position relative to silences).
+</p>
+
+### 6. Co-occurrences
+<p align="justify">
+Studies the immediate environment of a pivot word by counting words present within a defined distance. Results show the associated context type and occurrence counts globally or per tier, exportable to Excel format.
+</p>
+
+### License
+<p align="justify">
+This project is distributed under the terms of the license specified in the LICENSE file.
+</p>
+
+_The application architecture can be found below._
+
+---
+
+### Architecture
+![Architecture de Ling3](assets/diagram.png)
+
+Directory structure:
+└── v2/
+    ├── Cargo.toml
+    ├── compile.sh
+    ├── index.html
+    ├── styles.css
+    ├── todo.txt
+    ├── Trunk.toml
+    ├── src/
+    │   ├── app.rs
+    │   └── main.rs
+    ├── src-tauri/
+    │   ├── build.rs
+    │   ├── Cargo.toml
+    │   ├── tauri.conf.json
+    │   ├── capabilities/
+    │   │   └── default.json
+    │   ├── gen/
+    │   │   └── schemas/
+    │   │       └── capabilities.json
+    │   ├── icons/
+    │   │   └── android/
+    │   │       ├── mipmap-anydpi-v26/
+    │   │       │   └── ic_launcher.xml
+    │   │       └── values/
+    │   │           └── ic_launcher_background.xml
+    │   └── src/
+    │       ├── commands.rs
+    │       ├── config.rs
+    │       ├── excel.rs
+    │       ├── lib.rs
+    │       ├── main.rs
+    │       ├── models.rs
+    │       ├── settings.rs
+    │       └── textgrid/
+    │           ├── concordance.rs
+    │           ├── cooccurrences.rs
+    │           ├── editor.rs
+    │           ├── excel.rs
+    │           ├── mod.rs
+    │           ├── overlap.rs
+    │           ├── parser.rs
+    │           ├── tg_check.rs
+    │           ├── tokenisation.rs
+    │           └── trs_convert.rs
+    └── ui/
+        ├── Cargo.toml
+        ├── index.html
+        ├── Trunk.toml
+        ├── src/
+        │   ├── api.rs
+        │   ├── app.rs
+        │   ├── decoration.rs
+        │   ├── icons.rs
+        │   ├── main.rs
+        │   ├── theme.rs
+        │   └── views/
+        │       ├── chevauchement.rs
+        │       ├── concordancier.rs
+        │       ├── cooccurrences.rs
+        │       ├── info.rs
+        │       ├── mod.rs
+        │       ├── modification_textgrid.rs
+        │       ├── placeholder.rs
+        │       ├── settings.rs
+        │       └── tokenisation.rs
+        └── styles/
+            └── theme.css

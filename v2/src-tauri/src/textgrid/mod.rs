@@ -5,3 +5,4 @@ pub mod trs_convert;
 pub mod tokenisation;
 pub mod cooccurrences;
 pub mod concordance;
+pub mod tg_check;

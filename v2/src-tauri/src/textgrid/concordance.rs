@@ -18,6 +18,75 @@ pub struct ConcordanceReport {
     pub total_occurrences: usize,
 }
 
+struct ContextWords<'a> {
+    words: Vec<&'a str>,
+    marker_at: Option<usize>,
+}
+
+fn collect_left<'a>(interval_words: &[Vec<&'a str>], idx: usize, manquants: usize) -> ContextWords<'a> {
+    let mut collected: Vec<&str> = Vec::new();
+    let mut near_count: Option<usize> = None;
+    let mut k = idx;
+    while collected.len() < manquants && k > 0 {
+        k -= 1;
+        if interval_words[k].is_empty() {
+            if near_count.is_none() {
+                near_count = Some(collected.len());
+            }
+            continue;
+        }
+        let mut combined: Vec<&str> = interval_words[k].clone();
+        combined.extend(collected);
+        collected = combined;
+    }
+
+    let mut marker_at = near_count.map(|n| collected.len() - n);
+    if collected.len() > manquants {
+        let cut = collected.len() - manquants;
+        collected = collected[cut..].to_vec();
+        if let Some(m) = marker_at {
+            marker_at = Some(m.saturating_sub(cut));
+        }
+    }
+    ContextWords { words: collected, marker_at }
+}
+
+fn collect_right<'a>(interval_words: &[Vec<&'a str>], idx: usize, manquants: usize) -> ContextWords<'a> {
+    let mut collected: Vec<&str> = Vec::new();
+    let mut near_count: Option<usize> = None;
+    let mut k = idx;
+    while collected.len() < manquants && k + 1 < interval_words.len() {
+        k += 1;
+        if interval_words[k].is_empty() {
+            if near_count.is_none() {
+                near_count = Some(collected.len());
+            }
+            continue;
+        }
+        collected.extend(interval_words[k].iter().copied());
+    }
+
+    let marker_at = near_count;
+    if collected.len() > manquants {
+        collected.truncate(manquants);
+    }
+    ContextWords { words: collected, marker_at }
+}
+
+fn join_with_marker(words: &[&str], marker_at: Option<usize>) -> String {
+    match marker_at {
+        None => words.join(" "),
+        Some(pos) => {
+            let pos = pos.min(words.len());
+            let mut parts: Vec<&str> = Vec::with_capacity(words.len() + 1);
+            parts.extend(&words[..pos]);
+            parts.push("|_|");
+            parts.extend(&words[pos..]);
+            parts.join(" ")
+        }
+    }
+}
+
 pub fn generate(
     paths: &[String],
     pivots: &[String],
@@ -65,29 +134,19 @@ pub fn generate(
                 tier_number.to_string()
             };
 
-            // flat_words + interval_word_start : propres à CE tier, DANS CE
-            // FICHIER (le contexte ne traverse jamais deux fichiers, contrairement
-            // à Statistiques).
-            let mut flat_words: Vec<&str> = Vec::new();
-            let mut interval_word_start: Vec<usize> = Vec::new();
-            for interval in &tier.intervals {
-                interval_word_start.push(flat_words.len());
-                flat_words.extend(interval.text.split_whitespace());
-            }
-            interval_word_start.push(flat_words.len()); // sentinelle finale
-
-            let is_empty: Vec<bool> = tier.intervals.iter().map(|iv| iv.text.trim().is_empty()).collect();
+            let interval_words: Vec<Vec<&str>> =
+                tier.intervals.iter().map(|iv| iv.text.split_whitespace().collect()).collect();
 
             for (idx, interval) in tier.intervals.iter().enumerate() {
-                if is_empty[idx] {
+                if interval_words[idx].is_empty() {
                     continue;
                 }
                 let txt = &interval.text;
 
                 for pattern in &compiled {
                     for m in pattern.find_iter(txt) {
-                        let ip_empty = if idx == 0 { true } else { is_empty[idx - 1] };
-                        let in_empty = if idx == tier.intervals.len() - 1 { true } else { is_empty[idx + 1] };
+                        let ip_empty = if idx == 0 { true } else { interval_words[idx - 1].is_empty() };
+                        let in_empty = if idx == tier.intervals.len() - 1 { true } else { interval_words[idx + 1].is_empty() };
 
                         let pos = match (ip_empty, in_empty) {
                             (true, true) => "Isolé",
@@ -101,40 +160,37 @@ pub fn generate(
                         let mots_gauche_locaux: Vec<&str> = texte_gauche.split_whitespace().collect();
                         let mots_droit_locaux: Vec<&str> = texte_droit.split_whitespace().collect();
 
-                        let mots_gauche: Vec<&str> = if nb_left > 0 {
+                        let ctx_gauche = if nb_left > 0 {
                             let nb_left = nb_left as usize;
                             if mots_gauche_locaux.len() >= nb_left {
-                                mots_gauche_locaux[mots_gauche_locaux.len() - nb_left..].to_vec()
+                                mots_gauche_locaux[mots_gauche_locaux.len() - nb_left..].join(" ")
                             } else {
                                 let manquants = nb_left - mots_gauche_locaux.len();
-                                let debut_global = interval_word_start[idx];
-                                let start = debut_global.saturating_sub(manquants);
-                                let mut prefixe: Vec<&str> = flat_words[start..debut_global].to_vec();
-                                prefixe.extend(mots_gauche_locaux.iter());
-                                prefixe
+                                let prefixe = collect_left(&interval_words, idx, manquants);
+                                let mut all: Vec<&str> = prefixe.words.clone();
+                                all.extend(mots_gauche_locaux.iter().copied());
+                                join_with_marker(&all, prefixe.marker_at)
                             }
                         } else {
-                            Vec::new()
+                            String::new()
                         };
 
-                        let mots_droit: Vec<&str> = if nb_right > 0 {
+                        let ctx_droit = if nb_right > 0 {
                             let nb_right = nb_right as usize;
                             if mots_droit_locaux.len() >= nb_right {
-                                mots_droit_locaux[..nb_right].to_vec()
+                                mots_droit_locaux[..nb_right].join(" ")
                             } else {
                                 let manquants = nb_right - mots_droit_locaux.len();
-                                let fin_global = interval_word_start[idx + 1];
-                                let end = (fin_global + manquants).min(flat_words.len());
-                                let mut suffixe: Vec<&str> = mots_droit_locaux.clone();
-                                suffixe.extend(flat_words[fin_global..end].iter());
-                                suffixe
+                                let suffixe = collect_right(&interval_words, idx, manquants);
+                                let mut all: Vec<&str> = mots_droit_locaux.clone();
+                                let local_len = all.len();
+                                all.extend(suffixe.words.iter().copied());
+                                let marker_at = suffixe.marker_at.map(|m| local_len + m);
+                                join_with_marker(&all, marker_at)
                             }
                         } else {
-                            Vec::new()
+                            String::new()
                         };
-
-                        let ctx_gauche = mots_gauche.join(" ");
-                        let ctx_droit = mots_droit.join(" ");
 
                         let mut row_data: HashMap<&str, String> = HashMap::new();
                         row_data.insert("ID", occurrence_id.to_string());

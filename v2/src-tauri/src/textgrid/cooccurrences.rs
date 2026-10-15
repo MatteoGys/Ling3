@@ -17,7 +17,6 @@ pub type TokenSlot = Option<String>;
 #[derive(Debug, Clone, Default)]
 pub struct StatsBaseData {
     pub tiers_raw_tokens: HashMap<String, Vec<TokenSlot>>,
-    pub tier_order: Vec<String>,
 }
 
 #[derive(Debug, Clone, Serialize)]
@@ -87,13 +86,13 @@ pub fn load(paths: &[String]) -> (StatsBaseData, StatsLoadSummary) {
     }
 
     let summary = StatsLoadSummary {
-        tiers: tier_order.clone(),
+        tiers: tier_order,
         missing_files,
         error_files,
         processed_count,
     };
 
-    (StatsBaseData { tiers_raw_tokens, tier_order }, summary)
+    (StatsBaseData { tiers_raw_tokens }, summary)
 }
 
 #[derive(Debug, Clone, Serialize)]

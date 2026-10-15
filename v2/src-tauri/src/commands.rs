@@ -38,7 +38,10 @@ pub fn apply_text_modifications(
 ) -> Result<String, String> {
     let data = settings::get_current_data(state);
     if data.textgrid_path_files.is_empty() {
-        return Ok(String::new());
+        return Err(
+            "Aucun fichier TextGrid configuré. Veuillez vérifier vos paramètres."
+                .into()
+        );
     }
 
     let find = find.trim().to_string();
@@ -82,7 +85,10 @@ pub fn apply_pivot_extraction(
 ) -> Result<String, String> {
     let data = settings::get_current_data(state);
     if data.textgrid_path_files.is_empty() {
-        return Ok(String::new());
+        return Err(
+            "Aucun fichier TextGrid configuré. Veuillez vérifier vos paramètres."
+                .into()
+        );
     }
 
     let separator = data.separator.clone();
@@ -121,37 +127,16 @@ pub fn apply_pivot_extraction(
 
 /// ⬅ modification_TextGrid_view.py :: _convert_trs_to_tg
 ///
-/// Retourne un résultat par fichier (succès ou message d'erreur), dans le
-/// même ordre que `trs_paths`, pour que le frontend affiche un statut par
-/// fichier plutôt qu'un seul message global.
+/// Retourne un rapport par fichier (même ordre que `trs_paths`) : succès,
+/// corrections appliquées, problèmes restants, ou raisons précises d'un
+/// échec. Toute la logique (lecture du TRS, corrections, vérifications)
+/// vit dans textgrid/trs_convert.rs et textgrid/tg_check.rs.
 #[tauri::command(rename_all = "snake_case")]
-pub fn convert_trs_files(trs_paths: Vec<String>) -> Vec<Result<String, String>> {
+pub fn convert_trs_files(trs_paths: Vec<String>) -> Vec<trs_convert::TrsFileReport> {
+    let desktop = dirs::desktop_dir();
     trs_paths
         .iter()
-        .map(|element| {
-            if element.is_empty() || !Path::new(element).exists() {
-                return Err(format!("Fichier introuvable : {}", element));
-            }
-
-            // Suppression de la double extension si présente (ex: fichier.trs.xml -> fichier).
-            let stem = Path::new(element)
-                .file_stem()
-                .and_then(|s| s.to_str())
-                .unwrap_or("output");
-            let base_name = stem.strip_suffix(".trs").unwrap_or(stem);
-
-            let desktop = dirs::desktop_dir()
-                .ok_or_else(|| "Impossible de localiser le Bureau.".to_string())?;
-            let out_path = desktop.join(format!("{}.TextGrid", base_name));
-
-            trs_convert::convert_trs_to_textgrid(element, out_path.to_str().unwrap_or_default())
-                .map_err(|e| format!("Erreur lors de la conversion : {}", e))?;
-
-            Ok(format!(
-                "Conversion réussie ! Enregistré sur le bureau : {}.TextGrid",
-                base_name
-            ))
-        })
+        .map(|element| trs_convert::convert_file_to_report(element, desktop.as_deref()))
         .collect()
 }
 

@@ -1,6 +1,6 @@
 {
   "$schema": "https://schema.tauri.app/config/2",
-  "productName": "ling3",
+  "productName": "Ling3",
   "version": "2.0.0",
   "identifier": "com.matteo.ling3",
   "build": {
@@ -9,11 +9,11 @@
 	"cwd": "../ui" 
     },
     "beforeBuildCommand": {
-	"script": "trunk build",
+	"script": "trunk build --release",
 	"cwd": "../ui"
     },
     "devUrl": "http://localhost:1420",
-    "frontendDist": "../dist"
+    "frontendDist": "../ui/dist"
   },
   "app": {
     "withGlobalTauri": true,
@@ -21,7 +21,11 @@
       {
         "title": "Ling3",
         "width": 800,
-        "height": 600
+        "height": 600,
+        "minWidth": 800,
+        "minHeight": 450,
+        "titleBarStyle": "Overlay",
+        "hiddenTitle": true
       }
     ],
     "security": {

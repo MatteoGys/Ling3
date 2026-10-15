@@ -13,7 +13,6 @@
 //! première étape pour confirmer.
 
 use std::path::Path;
-use serde::Serialize;
 use umya_spreadsheet::{reader, writer, Spreadsheet};
 
 /// Récupère (en créant si besoin) une feuille prête à recevoir des données,

@@ -1,6 +1,7 @@
 <div align="center">
   <h1>Ling3</h1>
   <p><b>Application de bureau dédiée à l'analyse de fichiers TextGrid (Praat) pour la recherche linguistique</b></p>
+  <p><b>Desktop application for TextGrid (Praat) file analysis in linguistic research</b></p>
 
   <p>
     <a href="https://github.com/MatteoGys/Ling3/releases"><img alt="GitHub Release" src="https://img.shields.io/github/v/release/MatteoGys/Ling3?include_prereleases&color=0A84FF&label=version"></a>

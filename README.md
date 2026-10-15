@@ -9,7 +9,7 @@
     <a href="https://github.com/MatteoGys/Ling3/releases"><img alt="Linux x64 / ARM64" src="https://img.shields.io/badge/Linux-x64%20%2F%20ARM64-FCC624"></a>
     <a href="https://github.com/MatteoGys/Ling3/releases"><img alt="macOS Apple Silicon" src="https://img.shields.io/badge/macOS-Apple%20Silicon%20(M1%2B)-0A84FF"></a>
     <a href="https://github.com/MatteoGys/Ling3/releases"><img alt="macOS Intel" src="https://img.shields.io/badge/macOS-Intel%20(x86__64)-555555"></a>
-    <a href="https://github.com/MatteoGys/Ling3/blob/v2/LICENSE"><img alt="License" src="https://img.shields.io/badge/license-MIT%2FApache--2.0-green"></a>
+    <a href="https://github.com/MatteoGys/Ling3/blob/LICENSE"><img alt="License" src="https://img.shields.io/badge/license-MIT%2FApache--2.0-green"></a>
   </p>
 </div>
 

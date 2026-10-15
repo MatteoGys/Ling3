@@ -61,7 +61,8 @@ Etudie l'environnement immédiat d'un pivot en dénombrant les mots présents à
 </p>
 
 ### Architecture du projet
-[![Architecture diagram of matteogys/ling3](https://gitdiagram.com/matteogys/ling3/diagram.png)](https://gitdiagram.com/matteogys/ling3?utm_source=readme&utm_medium=picture)
+![Architecture de Ling3](assets/diagram.png)
+
 ### Licence
 <p align="justify">
 Ce projet est distribue sous les termes de la licence mentionnée dans le fichier LICENSE.

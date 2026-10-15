@@ -88,6 +88,7 @@ jobs:
           APPLE_SIGNING_IDENTITY: ${{ startsWith(matrix.platform, 'macos') && '-' || '' }}
         with:
           # Pas de Node/npm dans ce projet : on utilise le CLI Rust.
+          projectPath: "v2"
           tauriScript: cargo tauri
           tagName: v__VERSION__
           releaseName: 'Ling3 v__VERSION__'

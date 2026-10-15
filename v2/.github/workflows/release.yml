@@ -1,0 +1,102 @@
+# Construit Ling3 pour 4 build en parallèle (Mac Apple Silicon, Mac Intel,
+# Linux, Windows) puis dépose les installateurs dans une « release » GitHub,
+# créée en BROUILLON : rien n'est public tant que vous ne cliquez pas sur
+# « Publish release ».
+#
+# Déclenchement :
+#   - automatiquement quand une étiquette de version « v… » est poussée ;
+#   - à la main : onglet Actions → « Publier les installateurs » → Run workflow.
+#
+# Le nom de la release (v2.0.0, etc.) vient de la version écrite dans
+# src-tauri/tauri.conf.json.
+
+name: Publier les installateurs
+
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+
+jobs:
+  publish:
+    name: ${{ matrix.name }}
+    # Autorise le workflow à créer la release et à y déposer les fichiers.
+    permissions:
+      contents: write
+    strategy:
+      # Si une plateforme échoue, les trois autres continuent.
+      fail-fast: false
+      matrix:
+        include:
+          - name: macOS (Apple Silicon)
+            slug: macos-arm
+            platform: macos-latest
+            args: '--target aarch64-apple-darwin'
+          - name: macOS (Intel)
+            slug: macos-intel
+            platform: macos-latest
+            args: '--target x86_64-apple-darwin'
+          - name: Linux
+            slug: linux
+            platform: ubuntu-22.04
+            args: ''
+          - name: Windows
+            slug: windows
+            platform: windows-latest
+            args: ''
+    runs-on: ${{ matrix.platform }}
+    timeout-minutes: 60
+
+    steps:
+      - uses: actions/checkout@v7
+
+      # Bibliothèques système nécessaires pour compiler une app Tauri sous Linux.
+      - name: Installer les dépendances Linux
+        if: matrix.platform == 'ubuntu-22.04'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libwebkit2gtk-4.1-dev libappindicator3-dev librsvg2-dev patchelf xdg-utils libxdo-dev libssl-dev
+
+      # Rust, avec la cible WebAssembly de l'interface (Leptos) et, sur Mac,
+      # les deux architectures.
+      - name: Installer Rust
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: ${{ startsWith(matrix.platform, 'macos') && 'wasm32-unknown-unknown,aarch64-apple-darwin,x86_64-apple-darwin' || 'wasm32-unknown-unknown' }}
+
+      # Réutilise les compilations précédentes (bien plus rapide dès le 2e passage).
+      # La clé distingue les deux builds Mac, qui tournent sur la même machine.
+      - name: Cache Rust
+        uses: swatinem/rust-cache@v2
+        with:
+          key: ${{ matrix.slug }}
+          cache-on-failure: true
+
+      # Trunk (compile l'interface) et le CLI Tauri (cargo tauri).
+      - name: Installer Trunk et le CLI Tauri
+        uses: taiki-e/install-action@v2
+        with:
+          tool: trunk,tauri-cli
+
+      - name: Compiler et publier
+        uses: tauri-apps/tauri-action@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          # Signature « ad hoc » sur Mac (sans compte Apple payant) : évite que
+          # les Mac à puce Apple affichent « l'app est endommagée ».
+          APPLE_SIGNING_IDENTITY: ${{ startsWith(matrix.platform, 'macos') && '-' || '' }}
+        with:
+          # Pas de Node/npm dans ce projet : on utilise le CLI Rust.
+          tauriScript: cargo tauri
+          tagName: v__VERSION__
+          releaseName: 'Ling3 v__VERSION__'
+          releaseBody: |
+            Téléchargez le fichier qui correspond à votre système (section « Assets » ci-dessous) :
+            - **macOS, puce Apple (M1 et plus)** : fichier `…aarch64.dmg`
+            - **macOS, Mac Intel** : fichier `…x64.dmg`
+            - **Windows** : fichier `…setup.exe` (ou `.msi`)
+            - **Linux** : fichier `.AppImage` (ou `.deb` / `.rpm`)
+          releaseDraft: true
+          prerelease: false
+          args: ${{ matrix.args }}

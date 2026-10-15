@@ -2688,7 +2688,7 @@ checksum = "bfae20f6b19ad527b550c223fddc3077a547fc70cda94b9b566575423fd303ee"
 
 [[package]]
 name = "ling3"
-version = "1.2.1"
+version = "2.0.0"
 dependencies = [
  "dirs 5.0.1",
  "encoding_rs",
@@ -2697,6 +2697,7 @@ dependencies = [
  "serde_json",
  "tauri",
  "tauri-build",
+ "tauri-plugin-decoration",
  "tauri-plugin-dialog",
  "tauri-plugin-opener",
  "umya-spreadsheet",
@@ -4793,6 +4794,26 @@ dependencies = [
  "serde_json",
  "tauri-utils",
  "walkdir",
+]
+
+[[package]]
+name = "tauri-plugin-decoration"
+version = "2.1.4"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "b95e1479ae063c628a365af280c1a52355a640347d93da525d603a42e89c0548"
+dependencies = [
+ "anyhow",
+ "base64 0.22.1",
+ "gtk",
+ "objc2",
+ "objc2-app-kit",
+ "objc2-foundation",
+ "raw-window-handle",
+ "serde",
+ "serde_json",
+ "tauri",
+ "tauri-plugin",
+ "windows-sys 0.61.2",
 ]
 
 [[package]]

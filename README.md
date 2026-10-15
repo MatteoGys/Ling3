@@ -1,5 +1,5 @@
 <div align="center">
-  <img width="64" height="64" alt="Ling3 Logo" src="https://raw.githubusercontent.com/MatteoGys/Ling3/v2/src-tauri/icons/icon.png" />
+  <img width="64" height="64" alt="Ling3 Logo" src="v2/src-tauri/icons/icon.png" />
   <h1>Ling3</h1>
   <p><b>Application de bureau dédiée à l'analyse de fichiers TextGrid (Praat) pour la recherche linguistique</b></p>
 

@@ -60,6 +60,9 @@ Génère un concordancier sur mesure dans un fichier Excel en extrayant chaque o
 Etudie l'environnement immédiat d'un pivot en dénombrant les mots présents à une distance définie. Le résultat présente le type de contexte associe et le nombre d'occurrences globales ou par tier, exportable sous format Excel.
 </p>
 
+### Architecture du projet
+[(https://gitdiagram.com/matteogys/ling3/diagram.png)](https://gitdiagram.com/matteogys/ling3?utm_source=readme&utm_medium=picture)
+
 ### Licence
 <p align="justify">
 Ce projet est distribue sous les termes de la licence mentionnée dans le fichier LICENSE.

@@ -21,7 +21,6 @@
   
 _Ling3_ est un outil d'analyse de fichiers TextGrid (Praat) pensé pour le travail linguistique. L'application permet la détection de chevauchements, la préparation et la conversion de fichiers, le comptage de tokens, la génération d'un concordancier sur mesure ainsi que l'étude du contexte d'un pivot.
 </p>
----
 
 ## Fonctionnalités des modules
 

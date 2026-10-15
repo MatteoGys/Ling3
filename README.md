@@ -5,10 +5,10 @@
 
   <p>
     <a href="https://github.com/MatteoGys/Ling3/releases"><img alt="GitHub Release" src="https://img.shields.io/github/v/release/MatteoGys/Ling3?include_prereleases&color=0A84FF&label=version"></a>
-    <a href="https://github.com/MatteoGys/Ling3/releases"><img alt="Windows x64" src="https://img.shields.io/badge/Windows-10%20%2F%2011%20(x64)-0078D4"></a>
-    <a href="https://github.com/MatteoGys/Ling3/releases"><img alt="Linux x64 / ARM64" src="https://img.shields.io/badge/Linux-x64%20%2F%20ARM64-FCC624"></a>
-    <a href="https://github.com/MatteoGys/Ling3/releases"><img alt="macOS Apple Silicon" src="https://img.shields.io/badge/macOS-Apple%20Silicon%20(M1%2B)-0A84FF"></a>
-    <a href="https://github.com/MatteoGys/Ling3/releases"><img alt="macOS Intel" src="https://img.shields.io/badge/macOS-Intel%20(x86__64)-555555"></a>
+    <a href="https://github.com/MatteoGys/Ling3/releases/download/v2.0.0/Ling3_2.0.0_x64-setup.exe"><img alt="Windows x64" src="https://img.shields.io/badge/Windows-10%20%2F%2011%20(x64)-0078D4"></a>
+    <a href="https://github.com/MatteoGys/Ling3/releases/download/v2.0.0/Ling3_2.0.0_amd64.AppImage"><img alt="Linux x64 / ARM64" src="https://img.shields.io/badge/Linux-x64%20%2F%20ARM64-FCC624"></a>
+    <a href="https://github.com/MatteoGys/Ling3/releases/download/v2.0.0/Ling3_2.0.0_aarch64.dmg"><img alt="macOS Apple Silicon" src="https://img.shields.io/badge/macOS-Apple%20Silicon%20(M1%2B)-0A84FF"></a>
+    <a href="https://github.com/MatteoGys/Ling3/releases/download/v2.0.0/Ling3_2.0.0_x64.dmg"><img alt="macOS Intel" src="https://img.shields.io/badge/macOS-Intel%20(x86__64)-555555"></a>
     <a href="https://github.com/MatteoGys/Ling3/blob/main/LICENSE"><img alt="License" src="https://img.shields.io/badge/license-MIT%2FApache--2.0-green"></a>
   </p>
 </div>

@@ -111,7 +111,7 @@ pub fn SettingsView() -> impl IntoView {
             <hr class="divider" />
 
             <div class="card">
-                <p><strong>"Fichier(s) .TextGrid ou .txt"</strong></p>
+                <p style="margin-top:0;"><strong>"Fichier(s) .TextGrid ou .txt"</strong></p>
                 <p class="status-text" style="margin-top:0;">
                     "Un chemin par ligne — vous pouvez utiliser \"Parcourir\" ou taper/coller "
                     "directement les chemins."
@@ -129,7 +129,7 @@ pub fn SettingsView() -> impl IntoView {
             </div>
 
             <div class="card">
-                <p><strong>"Fichier Excel"</strong></p>
+                <p style="margin-top:0;"><strong>"Fichier Excel"</strong></p>
                 <div style="display:flex; gap:12px; align-items:center;">
                     <input
                         class="field"
@@ -142,7 +142,7 @@ pub fn SettingsView() -> impl IntoView {
             </div>
 
             <div class="card">
-                <p><strong>"Séparateur de mots clés / pivots"</strong></p>
+                <p style="margin-top:0;"><strong>"Séparateur de mots clés / pivots"</strong></p>
                 <input
                     class="field"
                     style="max-width: 150px;"

@@ -13,7 +13,7 @@ use crate::icons::{IconWarning};
 pub fn CooccurrencesView() -> impl IntoView {
     let summary = RwSignal::new(None::<StatsLoadSummary>);
     let pivot = RwSignal::new(String::new());
-    let distances_raw = RwSignal::new("1".to_string());
+    let distances_raw = RwSignal::new(String::new());
     let direction_suivant = RwSignal::new(true); // true = "Suivant" (défaut Python)
     let active_tiers = RwSignal::new(Vec::<String>::new());
     let menu_open = RwSignal::new(false);
@@ -62,6 +62,17 @@ pub fn CooccurrencesView() -> impl IntoView {
             match result {
                 Ok(s) => {
                     active_tiers.set(s.tiers.clone()); // ⬅ toutes actives par défaut, comme en Python
+                    if !s.missing_files.is_empty() || !s.error_files.is_empty() {
+                        let mut parts = vec![format!("{} fichier(s) analysé(s)", s.processed_count)];
+                        if !s.missing_files.is_empty() {
+                            parts.push(format!("{} introuvable(s)", s.missing_files.len()));
+                        }
+                        if !s.error_files.is_empty() {
+                            parts.push(format!("{} en erreur", s.error_files.len()));
+                        }
+                        status.set(format!("{}.", parts.join(" · ")));
+                        status_is_error.set(true);
+                    }
                     summary.set(Some(s));
                 }
                 Err(e) => {
@@ -72,13 +83,6 @@ pub fn CooccurrencesView() -> impl IntoView {
             loading.set(false);
         });
     };
-
-    // Chargement initial (⬅ on_show : charge si vide).
-    Effect::new(move |_| {
-        if summary.get_untracked().is_none() {
-            load();
-        }
-    });
 
     let toggle_tier = move |tier: String| {
         active_tiers.update(|list| {
@@ -94,8 +98,7 @@ pub fn CooccurrencesView() -> impl IntoView {
     let export = move |_| {
         let a = analysis.get_untracked();
         let Some(a) = a else {
-            status.set("Aucune donnée à exporter.".to_string());
-            status_is_error.set(true);
+            load();
             return;
         };
         if a.rows.is_empty() {
@@ -154,10 +157,10 @@ pub fn CooccurrencesView() -> impl IntoView {
     view! {
         <div class="view-scroll-container">
         <div class="view-scroll-area">
-            <h1 class="view-title">"Analyse de la concurrence d'un noeud"</h1>
+            <h1 class="view-title">"Analyse de la concurrence d'un nœud"</h1>
             <hr class="divider" />
 
-            <div class="card" style="display:flex; gap:12px; align-items:center; flex-wrap: wrap;">
+            <div class="card_with_field" style="display:flex; gap:12px; align-items:center; flex-wrap: wrap;">
                 <input
                     class="field" style="flex: 1; min-width: 180px;" type="text" placeholder="Pivot (ex: du coup)..."
                     prop:value=move || pivot.get()
@@ -180,7 +183,7 @@ pub fn CooccurrencesView() -> impl IntoView {
                     "Suivant"
                 </button>
                 <input
-                    class="field" style="max-width: 100px;" type="text" placeholder="1, 2, 3..."
+                    class="field" style="max-width: 60px;" type="text" placeholder="1,2,..."
                     prop:value=move || distances_raw.get()
                     on:input=move |ev| distances_raw.set(event_target_value(&ev))
                 />
@@ -214,11 +217,23 @@ pub fn CooccurrencesView() -> impl IntoView {
                     </Show>
                 </div>
 
-                <button class="btn btn-primary" on:click=move |_| run_analysis()>"Analyser"</button>
+                <button 
+                    class="btn btn-primary" 
+                    on:click=move |_| {
+                        if summary.get_untracked().is_none() {
+                            load();
+                            return;
+                        }
+                    
+                        run_analysis();
+                    }
+                >
+                    "Analyser"
+                </button>
             </div>
 
             <div class="card" style="overflow-x:auto;">
-                <table class="results">
+                <table style="margin-top:0;" class="results">
                     <thead>
                         <tr>
                             <th>"Type"</th>

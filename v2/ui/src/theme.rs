@@ -36,6 +36,10 @@ pub fn provide_theme() -> RwSignal<Theme> {
 }
 
 /// À appeler depuis n'importe quelle vue pour lire/écrire le thème courant.
+/// Pas encore utilisé ailleurs que via le signal direct dans `app.rs`, mais
+/// gardé disponible pour une future vue qui en aurait besoin (d'où le
+/// `#[allow]` plutôt qu'une suppression).
+#[allow(dead_code)]
 pub fn use_theme() -> RwSignal<Theme> {
     use_context::<RwSignal<Theme>>().expect("provide_theme() doit être appelé dans <App/>")
 }

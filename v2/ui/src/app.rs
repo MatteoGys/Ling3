@@ -71,84 +71,96 @@ pub fn App() -> impl IntoView {
 
     view! {
         <div id="app-root" data-theme=move || theme.get().as_attr()>
-            <aside class="sidebar" class:collapsed=move || !expanded.get()>
-                <div class="sidebar-header">
-                    <Show when=move || expanded.get()>
-                        <span class="app-title">"Ling3"</span>
-                    </Show>
-                    <button
-                        class="icon-btn"
-                        title="Réduire/Étendre"
-                        on:click=move |_| expanded.update(|e| *e = !*e)
-                    >
-                        <IconMenu />
-                    </button>
-                </div>
+            // ⬅ Bande de titre : remplace la barre système native (masquée
+            // via titleBarStyle "Overlay" + hiddenTitle dans tauri.conf.json).
+            // Purement visuelle : le plugin tauri-plugin-decoration gère lui
+            // -même le survol/déplacement de fenêtre par-dessus cette zone,
+            // colorée ici avec --color-bg-onglet comme demandé.
+            <div class="title-strip" data-tauri-drag-region="true"></div>
 
-                <hr class="divider" />
-
-                <nav class="nav-col">
-                    {NAV_ITEMS
-                        .iter()
-                        .map(|tab| {
-                            let tab = *tab;
-                            view! {
-                                <button
-                                    class="nav-btn"
-                                    class:active=move || current_tab.get() == tab
-                                    on:click=move |_| current_tab.set(tab)
-                                >
-                                    <span class="nav-icon">{nav_icon(tab)}</span>
-                                    <span class="nav-label">{tab.label()}</span>
-                                </button>
-                            }
-                        })
-                        .collect_view()}
-                </nav>
-
-                <hr class="divider" />
-
-                <div class="sidebar-footer">
-                    <Show when=move || expanded.get()>
-                        <span class="version-label">"v2.0.0 Bêta"</span>
-                    </Show>
-                    <div class="actions">
+            <div class="app-body">
+                <aside class="sidebar" class:collapsed=move || !expanded.get()>
+                    <div class="sidebar-header">
+                        <Show when=move || expanded.get()>
+                            <span class="app-title">"Ling3"</span>
+                        </Show>
                         <button
-                            class="round-btn"
-                            title="Paramètres"
-                            on:click=move |_| current_tab.set(Tab::Settings)
+                            class="icon-btn"
+                            title="Réduire/Étendre"
+                            on:click=move |_| expanded.update(|e| *e = !*e)
                         >
-                            <IconSettings />
-                        </button>
-                        <button
-                            class="round-btn"
-                            title="Changer le thème"
-                            on:click=move |_| theme.update(|t| *t = t.toggled())
-                        >
-                            <IconTheme />
-                        </button>
-                        <button
-                            class="round-btn"
-                            title="Documentation"
-                            on:click=move |_| current_tab.set(Tab::Info)
-                        >
-                            <IconInfo />
+                            <IconMenu />
                         </button>
                     </div>
-                </div>
-            </aside>
 
-            <main class="content-area">
-                {move || match current_tab.get() {
-                    Tab::Chevauchements => view! { <ChevauchementView /> }.into_any(),
-                    Tab::Modifications => view! { <ModificationView /> }.into_any(),
-                    Tab::Settings => view! { <SettingsView /> }.into_any(),
-                    Tab::Tokenisation => view! { <TokenisationView /> }.into_any(),
-                    Tab::Concordancier => view! { <ConcordancierView /> }.into_any(),
-                    Tab::Cooccurrences => view! { <CooccurrencesView /> }.into_any(),
-                    Tab::Info => view! { <InfoView /> }.into_any(),
-                }}
-            </main>
+                    <hr class="divider" />
+
+                    <nav class="nav-col">
+                        {NAV_ITEMS
+                            .iter()
+                            .map(|tab| {
+                                let tab = *tab;
+                                view! {
+                                    <button
+                                        class="nav-btn"
+                                        class:active=move || current_tab.get() == tab
+                                        on:click=move |_| current_tab.set(tab)
+                                    >
+                                        <span class="nav-icon">{nav_icon(tab)}</span>
+                                        <span class="nav-label">{tab.label()}</span>
+                                    </button>
+                                }
+                            })
+                            .collect_view()}
+                    </nav>
+
+                    <hr class="divider" />
+
+                    <div class="sidebar-footer">
+                        <Show when=move || expanded.get()>
+                            <span class="version-label">"v2.0.0 Bêta"</span>
+                        </Show>
+                        <div class="actions">
+                            <button
+                                class="round-btn"
+                                title="Paramètres"
+                                on:click=move |_| current_tab.set(Tab::Settings)
+                            >
+                                <IconSettings />
+                            </button>
+                            
+                            <Show when=move || expanded.get()>
+                                <button
+                                    class="round-btn"
+                                    title="Changer le thème"
+                                    on:click=move |_| theme.update(|t| *t = t.toggled())
+                                >
+                                    <IconTheme />
+                                </button>
+                                <button
+                                    class="round-btn"
+                                    title="Documentation"
+                                    on:click=move |_| current_tab.set(Tab::Info)
+                                >
+                                    <IconInfo />
+                                </button>
+                            </Show>
+                        </div>
+                    </div>
+                </aside>
+
+                <main class="content-area">
+                    {move || match current_tab.get() {
+                        Tab::Chevauchements => view! { <ChevauchementView /> }.into_any(),
+                        Tab::Modifications => view! { <ModificationView /> }.into_any(),
+                        Tab::Settings => view! { <SettingsView /> }.into_any(),
+                        Tab::Tokenisation => view! { <TokenisationView /> }.into_any(),
+                        Tab::Concordancier => view! { <ConcordancierView /> }.into_any(),
+                        Tab::Cooccurrences => view! { <CooccurrencesView /> }.into_any(),
+                        Tab::Info => view! { <InfoView /> }.into_any(),
+                    }}
+                </main>
+            </div>
         </div>
     }
 }

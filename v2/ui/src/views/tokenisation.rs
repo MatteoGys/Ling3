@@ -86,7 +86,7 @@ pub fn TokenisationView() -> impl IntoView {
         m
     });
     let menu_open = RwSignal::new(false);
-    let status = RwSignal::new("Prêt à analyser.".to_string());
+    let status = RwSignal::new(String::new());
     let status_is_error = RwSignal::new(false);
     let loading = RwSignal::new(false);
 
@@ -114,13 +114,6 @@ pub fn TokenisationView() -> impl IntoView {
             loading.set(false);
         });
     };
-
-    // Chargement initial paresseux (⬅ on_show : ne charge que si vide).
-    Effect::new(move |_| {
-        if data.get_untracked().is_none() {
-            load(());
-        }
-    });
 
     let handle_sort = move |col: String| {
         let current = sort_col.get_untracked();
@@ -150,7 +143,10 @@ pub fn TokenisationView() -> impl IntoView {
 
     let export = move |_| {
         let d = data.get_untracked();
-        let Some(d) = d else { return };
+        let Some(d) = d else { 
+            load(());
+            return;
+        };
         let tiers = active_tiers.get_untracked();
         let rows = compute_rows(&d, &search.get_untracked(), &sort_col.get_untracked(), &col_directions.get_untracked(), &tiers);
 
@@ -209,7 +205,7 @@ pub fn TokenisationView() -> impl IntoView {
             <h1 class="view-title">"Tokenisation & Occurrences"</h1>
             <hr class="divider" />
 
-            <div class="card" style="display:flex; gap:12px; align-items:center;">
+            <div class="card_with_field" style="display:flex; gap:12px; align-items:center;">
                 <input
                     class="field" type="text" placeholder="Rechercher un token..."
                     prop:value=move || search.get()
@@ -249,13 +245,13 @@ pub fn TokenisationView() -> impl IntoView {
                     </Show>
                 </div>
 
-                <button class="btn btn-success" on:click=move |_| load(()) disabled=move || loading.get()>
-                    {move || if loading.get() { "Chargement..." } else { "Rafraîchir" }}
+                <button class="btn btn-primary" on:click=move |_| load(()) disabled=move || loading.get()>
+                    "Rafraîchir"
                 </button>
             </div>
 
             <div class="card" style="overflow-x:auto;">
-                <table class="results">
+                <table style="margin-top:0;" class="results">
                     <thead>
                         <tr>
                             {move || {

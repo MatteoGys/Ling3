@@ -6,53 +6,59 @@ use leptos::task::spawn_local;
 use crate::api;
 use crate::icons::{IconCheck, IconWarning};
 
+/// Rapport de conversion d'un fichier TRS, tel que renvoyé par la commande
+/// `convert_trs_files` (miroir de `trs_convert::TrsFileReport` côté src-tauri).
+#[derive(Debug, Clone, serde::Deserialize)]
+struct TrsFileReport {
+    /// Un fichier a été écrit (.TextGrid, ou .txt si des bornes sont à corriger).
+    created: bool,
+    headline: String,
+    lines: Vec<TrsReportLine>,
+}
+
+#[derive(Debug, Clone, serde::Deserialize)]
+struct TrsReportLine {
+    text: String,
+    /// true : à afficher en rouge ; false : simple information.
+    is_error: bool,
+}
+
 #[component]
 pub fn ModificationView() -> impl IntoView {
     // ── Conversion TRS → TextGrid ─────────────────────────────────────────
-    let trs_paths = RwSignal::new(Vec::<String>::new());
-    let trs_label = RwSignal::new("Aucun fichier .trs.xml sélectionné".to_string());
+    // Un seul bouton : "Parcourir" ouvre le sélecteur, et dès que des
+    // fichiers en ressortent, la conversion s'enchaîne aussitôt dans la
+    // même action — plus besoin d'un second bouton "Convertir".
+    // `trs_status` ne sert qu'aux messages généraux (en cours, erreur du
+    // sélecteur) ; le résultat de chaque fichier est dans `trs_reports`.
     let trs_status = RwSignal::new(String::new());
     let trs_status_is_error = RwSignal::new(false);
+    let trs_reports = RwSignal::new(Vec::<TrsFileReport>::new());
 
-    let pick_trs = move |_| {
+    let pick_and_convert_trs = move |_| {
         spawn_local(async move {
             match api::pick_files("Sélectionner un ou plusieurs fichiers .trs", &["trs", "xml"], true).await {
                 Ok(paths) if !paths.is_empty() => {
-                    trs_label.set(format!("{} fichier(s) sélectionné(s)", paths.len()));
-                    trs_paths.set(paths);
-                }
-                Ok(_) => {}
-                Err(e) => {
-                    trs_status.set(e.to_string());
-                    trs_status_is_error.set(true);
-                }
-            }
-        });
-    };
+                    trs_reports.set(Vec::new());
+                    trs_status.set("Conversion en cours...".to_string());
+                    trs_status_is_error.set(false);
 
-    let convert_trs = move |_| {
-        let paths = trs_paths.get_untracked();
-        if paths.is_empty() {
-            return;
-        }
-        trs_status.set("Conversion en cours...".to_string());
-        trs_status_is_error.set(false);
-        spawn_local(async move {
-            let result: Result<Vec<Result<String, String>>, String> =
-                api::invoke("convert_trs_files", &api::TrsPathsArg { trs_paths: paths }).await;
-            match result {
-                Ok(results) => {
-                    let has_error = results.iter().any(|r| r.is_err());
-                    let summary = results
-                        .into_iter()
-                        .map(|r| r.unwrap_or_else(|e| e))
-                        .collect::<Vec<_>>()
-                        .join(" | ");
-                    trs_status.set(summary);
-                    trs_status_is_error.set(has_error);
+                    let result: Result<Vec<TrsFileReport>, String> =
+                        api::invoke("convert_trs_files", &api::TrsPathsArg { trs_paths: paths }).await;
+                    match result {
+                        Ok(reports) => {
+                            trs_status.set(String::new());
+                            trs_reports.set(reports);
+                        }
+                        Err(e) => {
+                            trs_status.set(e);
+                            trs_status_is_error.set(true);
+                        }
+                    }
                 }
+                Ok(_) => {} // annulé, rien à faire
                 Err(e) => {
-                    trs_status.set(e.to_string());
+                    trs_status.set(e);
                     trs_status_is_error.set(true);
                 }
             }
@@ -116,24 +122,70 @@ pub fn ModificationView() -> impl IntoView {
             <hr class="divider" />
 
             <div class="card">
-                <p><strong>"Conversion TRS → TextGrid"</strong></p>
-                <div style="display:flex; gap:12px; align-items:center;">
-                    <span class="status-text" class:status-error=move || trs_status_is_error.get() style="display: flex; align-items: center; gap: 6px;">
+                <p style="margin-top:0;"><strong>"Conversion TRS → TextGrid"</strong></p>
+                <div class="pivot-action-row">
+                    <button
+                        class="btn btn-primary"
+                        on:click=pick_and_convert_trs
+                    >
+                        "Parcourir"
+                    </button>
+
+                    <p class="status-text"
+                        class:status-error=move || trs_status_is_error.get() style="display: flex; align-items: center; gap: 6px;">
                         <Show when=move || trs_status_is_error.get()>
                             <IconWarning />
                         </Show>
-                        <Show when=move || !trs_status_is_error.get() && !trs_status.get().is_empty()>
-                            <IconCheck />
-                        </Show>
                         {move || trs_status.get()}
-                    </span>
-                    <button class="btn btn-primary" on:click=pick_trs>"Parcourir"</button>
-                    <button class="btn btn-success" on:click=convert_trs>"Convertir"</button>
+                    </p>
                 </div>
+
+                // Un bloc par fichier : icône + titre, puis le détail tabulé dessous.
+                {move || {
+                    trs_reports
+                        .get()
+                        .into_iter()
+                        .map(|report| {
+                            let created = report.created;
+                            view! {
+                                <div style="padding: 10px 0; margin-top: 10px; border-top: 1px solid var(--color-bg-container-border);">
+                                    <div
+                                        class="status-text"
+                                        class:status-error=move || !created
+                                        style="display: flex; align-items: center; gap: 8px; margin: 0;"
+                                    >
+                                        {if created {
+                                            view! { <IconCheck /> }.into_any()
+                                        } else {
+                                            view! { <IconWarning /> }.into_any()
+                                        }}
+                                        <span>{report.headline.clone()}</span>
+                                    </div>
+                                    {report
+                                        .lines
+                                        .into_iter()
+                                        .map(|line| {
+                                            let is_error = line.is_error;
+                                            view! {
+                                                <div
+                                                    class="status-text"
+                                                    class:status-error=move || is_error
+                                                    style="margin: 4px 0 0 28px;"
+                                                >
+                                                    {line.text}
+                                                </div>
+                                            }
+                                        })
+                                        .collect_view()}
+                                </div>
+                            }
+                        })
+                        .collect_view()
+                }}
             </div>
 
             <div class="card">
-                <p><strong>"Remplacement de texte & fusion des silences"</strong></p>
+                <p style="margin-top:0;"><strong>"Remplacement de texte & fusion des silences"</strong></p>
                 <div style="display:flex; gap:12px; margin-bottom: 10px;">
                     <input
                         class="field" type="text" placeholder="Texte cible..."
@@ -154,31 +206,48 @@ pub fn ModificationView() -> impl IntoView {
                     />
                     "Fusionner les intervalles de silence consécutifs"
                 </label>
-                <button class="btn btn-primary" on:click=apply_modifications>"Appliquer"</button>
-                <p class="status-text" class:status-error=move || mod_status_is_error.get() style="display: flex; align-items: center; gap: 6px;">
-                    <Show when=move || mod_status_is_error.get()>
-                        <IconWarning />
-                    </Show>
-                    {move || mod_status.get()}
-                </p>
+                
+                <div class="replace-action-row">
+                    <button 
+                        class="btn btn-primary" 
+                        on:click=apply_modifications
+                    >
+                        "Appliquer"
+                    </button>
+
+                    <p class="status-text" 
+                        class:status-error=move || mod_status_is_error.get() style="display: flex; align-items: center; gap: 6px;">
+                            <Show when=move || mod_status_is_error.get()>
+                                <IconWarning />
+                            </Show>
+                            {move || mod_status.get()}
+                    </p>
+                </div>
             </div>
 
             <div class="card">
-                <p><strong>"Extraction par mots pivots"</strong></p>
+                <p style="margin-top:0;"><strong>"Extraction par mots pivots"</strong></p>
                 <input
                     class="field" type="text" placeholder="pivot1\\pivot2\\pivot3..."
                     prop:value=move || pivots_raw.get()
                     on:input=move |ev| pivots_raw.set(event_target_value(&ev))
                 />
-                <button class="btn btn-primary" style="margin-top:10px;" on:click=apply_pivots>
-                    "Créer les fichiers *_pivot"
-                </button>
-                <p class="status-text" class:status-error=move || pivot_status_is_error.get() style="display: flex; align-items: center; gap: 6px;">
-                    <Show when=move || pivot_status_is_error.get()>
-                        <IconWarning />
-                    </Show>
-                    {move || pivot_status.get()}
-                </p>
+                <div class="pivot-action-row">
+                    <button
+                        class="btn btn-primary"
+                        on:click=apply_pivots
+                    >
+                        "Créer les fichiers *_pivot"
+                    </button>
+
+                    <p class="status-text"
+                        class:status-error=move || pivot_status_is_error.get() style="display: flex; align-items: center; gap: 6px;">
+                            <Show when=move || pivot_status_is_error.get()>
+                                <IconWarning />
+                            </Show>
+                            {move || pivot_status.get()}
+                    </p>
+                </div>
             </div>
         </div>
     }

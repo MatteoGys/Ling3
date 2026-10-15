@@ -102,10 +102,23 @@ pub fn InfoView() -> impl IntoView {
                             <li>
                                 <strong>"Conversion TRS → TextGrid"</strong>
                                 " — convertit un ou plusieurs fichiers "<code>".trs"</code>
-                                " (Transcriber, format du CFPP) en fichiers "<code>".TextGrid"</code>
+                                " (Transcriber, format du CFPP disponible "
+                                <a
+                                    href="https://cocoon.huma-num.fr/exist/crdo/search2.xql?lang=fr&collection=http%3A%2F%2Fcocoon.huma-num.fr%2Fpub%2FCOLLECTION_cocoon-8bc96a4e-9899-30e4-99be-c72d216eb38b"
+                                    target="_blank"
+                                >
+                                    "ici"
+                                </a>
+                                ") en fichiers "<code>".TextGrid"</code>
                                 ". Les fichiers convertis sont enregistrés sur le Bureau. "
-                                "L'algorithme s'appuie sur le projet LingTools de l'Université de "
-                                "l'Oregon (lingtools.uoregon.edu/tools/trans_to_praat.php)."
+                                "L'algorithme s'appuie sur le projet "
+                                 <a 
+                                    href="https://lingtools.uoregon.edu/tools/trans_to_praat.php"
+                                    target="_blank"
+                                >
+                                    "LingTools"
+                                </a>
+                                 " de l'Université de l'Oregon."
                             </li>
                             <li>
                                 <strong>"Remplacement de texte & fusion des silences"</strong>
@@ -219,7 +232,7 @@ pub fn InfoView() -> impl IntoView {
                             "apparaissent à une certaine distance de lui."
                         </p>
                         <p>
-                            "Saisissez un noeud/pivot (un seul mot ou une courte expression), choisissez "
+                            "Saisissez un nœud/pivot (un seul mot ou une courte expression), choisissez "
                             "le sens d'étude ("<strong>"Précédent"</strong>" ou "
                             <strong>"Suivant"</strong>"), et indiquez une ou plusieurs distances "
                             "(soit un horizon ou une fenêtre contextuelle précise) "

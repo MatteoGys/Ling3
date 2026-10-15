@@ -48,56 +48,75 @@ pub fn ChevauchementView() -> impl IntoView {
     };
 
     view! {
-        <div class="view-container">
+        <div class="view-scroll-container">
+        <div class="view-scroll-area">
             <h1 class="view-title">"Analyse des chevauchements"</h1>
             <hr class="divider" />
 
-            <div style="display:flex; align-items:center; gap:16px; margin: 16px 0;">
-                <button class="btn btn-primary" on:click=analyze disabled=move || running.get()>
-                    {move || if running.get() { "Analyse..." } else { "Lancer l'analyse TextGrid" }}
+            /* <div class="chevauchement-action-row">
+                <button 
+                    class="btn btn-primary" 
+                    on:click=analyze disabled=move || running.get()>
+                        {move || if running.get() { "Analyse..." } else { "Lancer l'analyse TextGrid" }}
                 </button>
-                <span
-                    class="status-text"
-                    class:status-error=move || status_is_error.get()
-                    style="display: flex; align-items: center; gap: 6px;"
-                >
+
+                <span class="status-text"
+                    class:status-error=move || status_is_error.get() style="display: flex; align-items: center; gap: 6px;">
                     <Show when=move || status_is_error.get()>
                         <IconWarning />
                     </Show>
                     {move || status.get()}
                 </span>
-            </div>
+            </div> */
 
-            <table class="results">
-                <thead>
-                    <tr>
-                        <th>"Tier (Source)"</th>
-                        <th>"N° Intervalle"</th>
-                        <th>"Timecode (x_max)"</th>
-                        <th>"Texte Source"</th>
-                        <th style="color: var(--color-red);">"Erreur dans"</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {move || {
-                        report.get().map(|r| {
-                            r.results.into_iter().flat_map(|file_result| {
-                                file_result.errors.into_iter().map(|err| {
-                                    view! {
-                                        <tr>
-                                            <td>{err.source_tier}</td>
-                                            <td>{err.interval_idx.to_string()}</td>
-                                            <td>{format!("{:.4}", err.timecode)}</td>
-                                            <td>{err.text}</td>
-                                            <td style="color: var(--color-red); font-weight: bold;">{err.error_tiers}</td>
-                                        </tr>
-                                    }
-                                }).collect::<Vec<_>>()
-                            }).collect_view()
-                        })
-                    }}
-                </tbody>
-            </table>
+            <div class="card" style="overflow-x:auto;">
+                <table style="margin-top:0;" class="results">
+                    <thead>
+                        <tr>
+                            <th>"Tier (Source)"</th>
+                            <th>"N° Intervalle"</th>
+                            <th>"Timecode (x_max)"</th>
+                            <th>"Texte Source"</th>
+                            <th style="color: var(--color-red);">"Erreur dans"</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {move || {
+                            report.get().map(|r| {
+                                r.results.into_iter().flat_map(|file_result| {
+                                    file_result.errors.into_iter().map(|err| {
+                                        view! {
+                                            <tr>
+                                                <td>{err.source_tier}</td>
+                                                <td>{err.interval_idx.to_string()}</td>
+                                                <td>{format!("{:.4}", err.timecode)}</td>
+                                                <td>{err.text}</td>
+                                                <td style="color: var(--color-red); font-weight: bold;">{err.error_tiers}</td>
+                                            </tr>
+                                        }
+                                    }).collect::<Vec<_>>()
+                                }).collect_view()
+                            })
+                        }}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+            <div class="view-action-bar-fixed">
+                <span class="status-text"
+                    class:status-error=move || status_is_error.get() style="display: flex; align-items: center; gap: 6px;">
+                    <Show when=move || status_is_error.get()>
+                        <IconWarning />
+                    </Show>
+                    {move || status.get()}
+                </span>
+                <button 
+                    class="btn btn-primary" 
+                    style=""
+                    on:click=analyze disabled=move || running.get()>
+                        {move || if running.get() { "Analyse..." } else { "Lancer l'analyse TextGrid" }}
+                </button>
+            </div>
         </div>
     }
 }

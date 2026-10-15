@@ -111,24 +111,26 @@ pub fn ConcordancierView() -> impl IntoView {
             <h1 class="view-title">"Concordancier Excel"</h1>
             <hr class="divider" />
 
-            <div class="card" style="display:flex; gap:16px;">
+            <div class="card_with_field" style="display:flex; gap:12px; align-items:center; ">
                 <input
-                    class="field" style="flex: 1;" type="text" placeholder="Ex: euh\\hum\\du coup"
+                    class="field" style="flex: 1; min-width: 100px;" type="text" placeholder="Ex: euh\\hum\\du coup"
                     prop:value=move || pivots_raw.get()
                     on:input=move |ev| pivots_raw.set(event_target_value(&ev))
                 />
-                <div>
-                    <label class="status-text">"Mots avant (Gauche)"</label>
+                <div style="display:flex; align-items:center; gap:8px;">
+                    <label class="status-text" style="text-align:center; line-height:1.1; margin:0;">
+                    "Mots avant" <br /> "(Gauche)"</label>
                     <input
-                        class="field" style="width: 100px;" type="text"
+                        class="field" style="width: 55px;" type="text"
                         prop:value=move || nb_left.get()
                         on:input=move |ev| nb_left.set(event_target_value(&ev))
                     />
                 </div>
-                <div>
-                    <label class="status-text">"Mots après (Droite)"</label>
+                <div style="display:flex; align-items:center; gap:8px;">
+                    <label class="status-text" style="text-align:center; line-height:1.1; margin:0;">
+                    "Mots après" <br /> "(Droite)"</label>
                     <input
-                        class="field" style="width: 100px;" type="text"
+                        class="field" style="width: 55px;" type="text"
                         prop:value=move || nb_right.get()
                         on:input=move |ev| nb_right.set(event_target_value(&ev))
                     />
@@ -193,8 +195,8 @@ pub fn ConcordancierView() -> impl IntoView {
                     </Show>
                     {move || status.get()}
                 </span>
-                <button class="btn btn-primary" on:click=generate disabled=move || generating.get()>
-                    {move || if generating.get() { "Génération..." } else { "Générer le fichier Excel" }}
+                <button class="btn btn-success" on:click=generate disabled=move || generating.get()>
+                    {move || if generating.get() { "Génération..." } else { "Export Excel" }}
                 </button>
             </div>
         </div>

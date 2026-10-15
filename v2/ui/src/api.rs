@@ -45,7 +45,6 @@ pub struct Empty {}
 
 #[derive(Debug, Clone, serde::Deserialize, Default)]
 pub struct ProfileData {
-    pub textgrid_path_show: String,
     pub textgrid_path_files: Vec<String>,
     pub excel_path: String,
     pub separator: String,
@@ -62,7 +61,6 @@ pub struct OverlapError {
 
 #[derive(Debug, Clone, serde::Deserialize)]
 pub struct FileOverlapResult {
-    pub file: String,
     pub errors: Vec<OverlapError>,
 }
 
